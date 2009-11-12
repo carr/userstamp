@@ -43,11 +43,16 @@ module ActiveRecord
     end
 
     private
+      def user_id
+        current_user = User.current_user
+        return nil if current_user.nil?
+        current_user.id
+      end
+
       def create_with_userstamps #:nodoc:
         if record_userstamps
-          current_user = User.current_user
-          unless current_user.nil?
-            t = current_user.id
+          t = user_id
+          unless t.nil?
             write_attribute('created_by', t) if respond_to?(:created_by) && created_by.nil?
             write_attribute('updated_by', t) if respond_to?(:updated_by) && updated_by.nil?
           end
@@ -57,7 +62,10 @@ module ActiveRecord
 
       def update_with_userstamps(*args) #:nodoc:
         if record_userstamps && (!partial_updates? || changed?)
-          write_attribute('updated_by', t) if respond_to?(:updated_by)
+          t = user_id
+          unless t.nil?
+            write_attribute('updated_by', t) if respond_to?(:updated_by)
+          end
         end
         update_without_userstamps(*args)
       end
