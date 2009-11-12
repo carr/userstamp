@@ -2,7 +2,7 @@ module ActiveRecord
   # Active Record automatically userstamps create and update operations if the table has fields
   # named created_by or updated_by.
   #
-  # Timestamping can be turned off by setting
+  # Userstamping can be turned off by setting
   #   <tt>ActiveRecord::Base.record_userstamps = false</tt>
   module Userstamp
     def self.included(base) #:nodoc:
@@ -45,11 +45,14 @@ module ActiveRecord
     private
       def create_with_userstamps #:nodoc:
         if record_userstamps
-          t = User.current_user.id
-          write_attribute('created_by', t) if respond_to?(:created_by) && created_by.nil?
-          write_attribute('updated_by', t) if respond_to?(:updated_by) && updated_by.nil?
+          current_user = User.current_user
+          unless current_user.nil?
+            t = current_user.id
+            write_attribute('created_by', t) if respond_to?(:created_by) && created_by.nil?
+            write_attribute('updated_by', t) if respond_to?(:updated_by) && updated_by.nil?
+          end
         end
-        create_without_timestamps
+        create_without_userstamps
       end
 
       def update_with_userstamps(*args) #:nodoc:
