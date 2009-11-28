@@ -1,0 +1,9 @@
+= Userstamp
+Automatically set created_by and updated_by fields.
+
+Rails 2.3 compatible.
+
+= Usage
+In a before filter do:
+    Thread.current['stamper_id'] = current_user.id
+
