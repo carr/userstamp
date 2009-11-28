@@ -18,10 +18,6 @@ module ActiveRecord
     end
 
     module ClassMethods
-      def set_user_model_name(name)
-        self.user_model_name = name
-      end
-
       def stampable
         class_eval do
           belongs_to :creator, :class_name => "User", :foreign_key => "created_by"
@@ -44,9 +40,7 @@ module ActiveRecord
 
     private
       def user_id
-        current_user = User.current_user
-        return nil if current_user.nil?
-        current_user.id
+        current_user = Thread.current['stamper_id']
       end
 
       def create_with_userstamps #:nodoc:
